@@ -1,5 +1,3 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
 
 .chip {
   @include btn-base;

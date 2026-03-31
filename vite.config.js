@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const SCSS_PARTIALS = [
   '_variables.scss',
@@ -9,8 +13,7 @@ const SCSS_PARTIALS = [
   'index.scss',
 ];
 
-const variablesPath = path.resolve(__dirname, 'src/styles/_variables.scss').replace(/\\/g, '/');
-const mixinsPath    = path.resolve(__dirname, 'src/styles/_mixins.scss').replace(/\\/g, '/');
+const stylesDir = path.resolve(__dirname, 'src/styles');
 
 export default defineConfig({
   plugins: [react()],
@@ -27,12 +30,11 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        // Injects variables + mixins into every component SCSS module
-        // automatically — skips the partials themselves to avoid circular @use.
+        includePaths: [stylesDir],
         additionalData: (content, filepath) => {
           const isPartial = SCSS_PARTIALS.some((name) => filepath.endsWith(name));
           if (isPartial) return content;
-          return `@use "${variablesPath}" as *;\n@use "${mixinsPath}" as *;\n${content}`;
+          return `@import 'variables';\n@import 'mixins';\n${content}`;
         },
       },
     },
